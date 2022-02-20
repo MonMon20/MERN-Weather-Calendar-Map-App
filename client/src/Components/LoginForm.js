@@ -6,7 +6,7 @@ function LoginForm({ Login, error }) {
 
   const submitHandler = (e) => {
     e.preventDefault();
-
+  if(!details.name || !details.email ||!details.password) return
     Login(details);
   };
 
@@ -23,6 +23,7 @@ function LoginForm({ Login, error }) {
             id="name"
             onChange={(e) => setDetails({ ...details, name: e.target.value })}
             value={details.name}
+             required
           />
         </div>
         <div className="form-group">
@@ -33,6 +34,7 @@ function LoginForm({ Login, error }) {
             id="email"
             onChange={(e) => setDetails({ ...details, email: e.target.value })}
             value={details.email}
+            required
           />
         </div>
         <div className="form-group">
@@ -45,6 +47,7 @@ function LoginForm({ Login, error }) {
               setDetails({ ...details, password: e.target.value })
             }
             value={details.password}
+            required
           />
         </div>
         <input type="submit" value="LOGIN" />

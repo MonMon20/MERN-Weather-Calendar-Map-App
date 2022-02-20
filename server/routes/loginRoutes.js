@@ -3,24 +3,36 @@ const UserSchema = require("../models/UserSchema");
 const loginRoutes = (app) => {
   app.post(`/api/login`, async (req, res) => {
     const session = req.session;
+    console.log(req.body);
     const { email, password, username } = req.body;
     if (!email || !username || !password) {
       res.status(400).json({ message: "Something missing" });
     }
-    console.log(email, username)
-    UserSchema.findOne({ username:username }).then((user) => {
-        console.log(user)
+    console.log(email, username);
+    UserSchema.findOne({ email }).then((user) => {
+      console.log(user);
       if (!user) {
-       return res.status(400).json({ message: "User not found" });
+        return res.status(400).json({ message: "User not found" });
       }
-      const userSession = { name: user.login.username, email: user.email };
-      session.userSession = userSession
-      res.status(200).json({ message: "You have logged in successfully", userSession });
+      if (user.password === password) {
+        //Not something thats supposed to be in production
+        const userSession = { name: user.username, email: user.email };
+        session.userSession = userSession;
+        return res
+          .status(200)
+          .json({ message: "You have logged in successfully", userSession });
+      } else {
+        return res.status(400).send("The credentials are incorrect");
+      }
     });
   });
-  app.get(`/api/logout`, async (req, res) => {
+  app.delete(`/api/logout`, async (req, res) => {
     req.session.destroy((error) => {
-      res.status(200).send("Logout Success");
+      if (error) {
+        return res.status(400).send("error logging out");
+      }
+      res.clearCookie("session_id");
+      return res.status(200).send("Logout Success");
     });
   });
 };
